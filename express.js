@@ -3,37 +3,61 @@ const app = express();
 
 app.use(express.json());
 
-var users = [
-    {id :"1",fullname: "yavuz özbay", age :39, role: "admin"},
-    {id :"2",fullname: "yavuz", age :3, role: "ad"},
-    {id :"3",fullname: "yavuz özb", age :9, role: "min"}
+var users = [{
+        id: "1",
+        fullname: "yavuz özbay",
+        age: 39,
+        role: "admin"
+    },
+    {
+        id: "2",
+        fullname: "yavuz",
+        age: 3,
+        role: "ad"
+    },
+    {
+        id: "3",
+        fullname: "yavuz özb",
+        age: 9,
+        role: "min"
+    }
 
 ]
 
-app.get('/users', (req, res)=>{
-    return res.status(301).json({message: "Moved Permanently!"});
+app.get('/users', (req, res) => {
+    return res.status(301).json({
+        message: "Moved Permanently!"
+    });
 })
 
-app.get('/', (req, res)=>{
+app.get('/', (req, res) => {
     return res.status(200).json(users);
 })
 
-app.get('/admin/:key', (req, res)=> {
+app.get('/admin/:key', (req, res) => {
     const key = req.params.key;
-    users.forEach((user)=>{
-        if(key=== user.id){
-            if(user.role!=='admin'){
-                return res.status(403).json({message:"Forbidden !"});
+    users.forEach((user) => {
+        if (key === user.id) {
+            if (user.role !== 'admin') {
+                return res.status(403).json({
+                    message: "Forbidden !"
+                });
             }
         }
     })
     return res.status(200).json('success!')
 })
 
-app.post('/create', (req, res)=>{
-    const { fullname, age, role}= req.body;
-    if(!(fullname && age && role)){
-        return res.status(400).json({message:"Bad Request"});
+app.post('/create', (req, res) => {
+    const {
+        fullname,
+        age,
+        role
+    } = req.body;
+    if (!(fullname && age && role)) {
+        return res.status(400).json({
+            message: "Bad Request"
+        });
     }
     const newUser = {
         fullname,
@@ -43,19 +67,27 @@ app.post('/create', (req, res)=>{
     users.push(newUser);
 })
 
-app.delete('/:id', (req, res)=>{
+app.delete('/:id', (req, res) => {
     const id = req.params.id;
-    users =users.filter((user)=> user.id !== id);
-
-    return res.json(users);
+    try {
+        users = users.filter((user) => user.id !== id);
+        throw new Error()
+        return res.json(users);
+    } catch (err) {
+        return res.status(500).json({
+            message: "Server Error!"
+        });
+    }
 })
 
-app.put('/user/:id', (req, res)=>{
+app.put('/user/:id', (req, res) => {
     const id = req.params.id;
-    const {fullname} = req.body;
+    const {
+        fullname
+    } = req.body;
 
-    users.forEach((user)=> {
-        if (user.id===id){
+    users.forEach((user) => {
+        if (user.id === id) {
             user.fullname = fullname;
         }
     })
@@ -63,6 +95,6 @@ app.put('/user/:id', (req, res)=>{
 })
 
 const port = 5000;
-app.listen(port, ()=> {
+app.listen(port, () => {
     console.log(`localhost:${port} is active!`)
 })
