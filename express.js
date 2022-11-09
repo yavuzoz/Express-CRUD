@@ -11,11 +11,30 @@ var users = [
 ]
 
 app.get('/users', (req, res)=>{
+    return res.status(301).json({message: "Moved Permanently!"});
+})
+
+app.get('/', (req, res)=>{
     return res.status(200).json(users);
+})
+
+app.get('/admin/:key', (req, res)=> {
+    const key = req.params.key;
+    users.forEach((user)=>{
+        if(key=== user.id){
+            if(user.role!=='admin'){
+                return res.status(403).json({message:"Forbidden !"});
+            }
+        }
+    })
+    return res.status(200).json('success!')
 })
 
 app.post('/create', (req, res)=>{
     const { fullname, age, role}= req.body;
+    if(!(fullname && age && role)){
+        return res.status(400).json({message:"Bad Request"});
+    }
     const newUser = {
         fullname,
         age,
@@ -31,7 +50,7 @@ app.delete('/:id', (req, res)=>{
     return res.json(users);
 })
 
-app.get('/user/:id', (req, res)=>{
+app.put('/user/:id', (req, res)=>{
     const id = req.params.id;
     const {fullname} = req.body;
 
